@@ -1,5 +1,17 @@
 <?php
+
+/**
+ * BeehiveBehavior
+ */
+/**
+ * BeehiveBehavior code license:
+ *
+ * @copyright Copyright (C) 2010 saku All rights reserved.
+ * @since CakePHP(tm) v 1.2
+ * @license http://www.opensource.org/licenses/mit-license.php The MIT License
+ */
 class BeehiveBehavior extends ModelBehavior { 
+    const VERSION = '0.1';
     var $settings = array();
     
     // ディレクトリを作成した場合のパーミッション
@@ -44,6 +56,9 @@ class BeehiveBehavior extends ModelBehavior {
                 // 移動パスは必須項目
                 die("beehiveListにpathを設定してください");
             }
+            
+            // パスを加工する
+            $setting['path'] = $this->_formatPath($setting['path']);
             
             // 削除処理
             if(isset($data[$modelName]['delete_' . $col]) && ($data[$modelName]['delete_' . $col] == true)){
@@ -103,14 +118,16 @@ class BeehiveBehavior extends ModelBehavior {
 	 * @author sakuragawa
 	 */
     private function _checkDirectory($path){
-        if(!is_dir($path)){
+        $basePath = WWW_ROOT . $path;
+        
+        if(!is_dir($basePath)){
             // ディレクトリが存在しない
-            $ret = mkdir($path, BeehiveBehavior::DIR_PERMISSION, true);
+            $ret = @mkdir($basePath, BeehiveBehavior::DIR_PERMISSION, true);
             if($ret === false){
                 die('ファイル配置用ディレクトリの作成に失敗しました。<br />権限等を確認してください。');
             }
             // umaskの方がいいのかな？
-            chmod($path, BeehiveBehavior::DIR_PERMISSION);
+            chmod($basePath, BeehiveBehavior::DIR_PERMISSION);
         }
         
         return true;
@@ -236,6 +253,23 @@ class BeehiveBehavior extends ModelBehavior {
         ImageDestroy($outImage);
 
         return true;
+    }
+    
+    
+	/**
+	 * 使いやすいようにパスを加工する
+	 * ※先頭は「/」なし
+	 * ※終端は「/」あり
+	 * 
+	 * @access public
+	 * @author sakuragawa
+	 */
+    private function _formatPath($path){
+        // 前後の「/」を切り捨てて、「/」をつける
+        $str = trim($path, "/");
+        $str .= '/';
+        
+        return $str;
     }
 }
 ?>
