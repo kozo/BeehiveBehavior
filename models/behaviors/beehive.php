@@ -41,7 +41,6 @@ class BeehiveBehavior extends ModelBehavior {
         return true;
     }
     
-    
     /**
      * ファイルアップロードを実行する
      * 
@@ -191,7 +190,9 @@ class BeehiveBehavior extends ModelBehavior {
             return false;
         }
         $id = $model->data[$modelName]['id'];
+        $buf = array_diff($model->data, array());
         $row = $model->read(null, $id);
+        $model->data = $buf;
         if(empty($row)){
             // 削除対象となるデータがない
             return false;
@@ -200,7 +201,6 @@ class BeehiveBehavior extends ModelBehavior {
             // 値がない
             return false;
         }
-        
         $deleteFileName = $row[$modelName][$col];
         $deleteFilePath = WWW_ROOT . ltrim($deleteFileName, '/');
         
@@ -213,7 +213,6 @@ class BeehiveBehavior extends ModelBehavior {
                 @unlink($deleteFilePath);
             }
         }
-        
         return ;
     }
     
